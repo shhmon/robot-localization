@@ -14,21 +14,30 @@ class ObservationModel:
 
         self.dim = self.rows * self.cols * self.head
         # Wall, noWall, nothing
-        self.numOfReadings = 2 # + 1
+        self.numOfReadings = 2
 
-        self.vectors = np.ones(shape=(self.numOfReadings, self.dim))
+        self.vectors = np.zeros(shape=(self.numOfReadings, self.dim))
         
-        for o in range(self.numOfReadings-1):
+        for o in range(self.numOfReadings):
+
             for rs in range(self.dim):
                 x, y, h = self.stateModel.robotStateToXYH(rs)
                 dirs = list(map(lambda d: d.value, Maze.shape[y][x]))
 
-                # Enum, not sure if this is ok
+                if o == 0 and h not in dirs:
+                    self.vectors[o, rs] = 1
+                elif o == 1 and h in dirs:
+                    self.vectors[o, rs] = 1
+
+            self.vectors[o] /= sum(self.vectors[o])
+                
+            print(sum(self.vectors[o]))
+
                 # If current heading blocked by wall
-                if h not in dirs:
-                    self.vectors[o, rs] = 0.8
-                else:
-                    self.vectors[o, rs] = 0.2
+                # if o == 0 and h not in dirs:
+                #     self.vectors[o, rs] = 0.8
+                # if o == 1 and h in dirs:
+                #     self.vectors[o, rs] = 0.2
 
                 # Add nothing
                 # self.vectors[self.numOfReadings-1, rs] = 0.1

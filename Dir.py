@@ -8,6 +8,10 @@ class Dir(Enum):
 	R = -1
 
 	@staticmethod
+	def Values():
+		return [Dir.N, Dir.W, Dir.S, Dir.E]
+
+	@staticmethod
 	def Next(head, alts):
 		valid = lambda d: d in alts
 

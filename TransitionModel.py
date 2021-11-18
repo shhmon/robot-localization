@@ -27,23 +27,28 @@ class TransitionModel:
             dirs = list(map(lambda d: d.value, Maze.shape[y][x]))
             next = Dir.Next(Dir(h), Maze.shape[y][x]).value
 
+            # nx, ny, nh = step forward
+            if h == Dir.N.value:
+                nx, ny, nh = x, y-1, h
+            elif h == Dir.W.value:
+                nx, ny, nh = x-1, y, h
+            elif h == Dir.S.value:
+                nx, ny, nh = x, y+1, h
+            elif h == Dir.E.value:
+                nx, ny, nh = x+1, y, h
+
             # Current heading available
             if h in dirs:
-                if h == Dir.N.value:
-                    nx, ny, nh = x, y-1, h
-                elif h == Dir.W.value:
-                    nx, ny, nh = x-1, y, h
-                elif h == Dir.S.value:
-                    nx, ny, nh = x, y+1, h
-                elif h == Dir.E.value:
-                    nx, ny, nh = x+1, y, h
-
                 j = self.stateModel.xyhToRobotState(nx, ny, nh)
                 self.matrix[i, j] = 1
+            # Wall in front
             else:
-                print(next)
                 j = self.stateModel.xyhToRobotState(x, y, next)
-                self.matrix[i, j] = 1
+                self.matrix[i, j] = 0.95
+
+                if nx > 0 and nx < self.cols and ny > 0 and ny < self.rows:
+                    j = self.stateModel.xyhToRobotState(nx, ny, nh)
+                    self.matrix[i, j] = 0.05
                 
                 
     # retrieve the number of states represented in the matrix                        

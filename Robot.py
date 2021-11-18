@@ -36,6 +36,11 @@ class RobotSim:
 	def update(self, maze):
 		dirs = maze.shape[self.pos[1]][self.pos[0]]
 
+		if (self.pos[0] == 3 and self.pos[1] == 3):
+			dirs = [*dirs, Dir.S]
+		elif (self.pos[0] == 3 and self.pos[1] == 4):
+			dirs = [Dir.W, Dir.S, Dir.N]
+
 		if self.head in dirs:
 			self.step()
 		else:

@@ -68,19 +68,23 @@ def draw_probs(surface, trueState):
 
 while True:
 
-	screen.fill(white)
-	maze.draw(screen)
-	robot.draw(screen, wallLength)
-	draw_probs(screen, stateModel.xyhToRobotState(robot.pos[0], robot.pos[1], robot.head.value))
 	rpos = robot.update(maze)
 	rstate = stateModel.xyhToRobotState(rpos[0], rpos[1], rpos[2].value)
 	px, py = localizer.update(rstate, robot.sense(maze))
+
 	print(f'update: robot pos {rpos}')
 	print(f'update: localizer pos {px, py}')
 
-	events = pygame.event.get()
+	screen.fill(white)
 
-	pygame.draw.circle(screen, (0,0,255), (px * wallLength + wallLength/2, py * wallLength + wallLength/2), 5)
+	rect = pygame.Rect(px * wallLength, py * wallLength, wallLength, wallLength)
+	pygame.draw.rect(screen, (200,200,255), rect)
+
+	maze.draw(screen)
+	robot.draw(screen, wallLength)
+	draw_probs(screen, stateModel.xyhToRobotState(robot.pos[0], robot.pos[1], robot.head.value))
+
+	events = pygame.event.get()
 
 	for e in events:
 		if e.type == pygame.MOUSEBUTTONDOWN:
@@ -89,7 +93,7 @@ while True:
 			raise SystemExit()
 	
 	pygame.display.update()
-	clock.tick(2)
+	clock.tick(3)
 	cnt += 1
 
 	# if cnt == 1:
