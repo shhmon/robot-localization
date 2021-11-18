@@ -6,12 +6,15 @@ class HMMFilter:
 		self.states = tm.getNrOfStates()
 	
 	def initialize(self, state):
-		self.f = np.zeros(self.states).T
+		self.f = np.zeros(self.states)
 		self.f[state] = 1
+		self.f = self.f.T
 	
 	def update(self, sense):
-		o  = np.diag(self.om.getOr(sense))
+		vector = self.om.getOr(sense)
+		o  = np.diag(vector)
 		tt = self.tm.getT_transp()
-		f = np.dot(np.dot(o, tt), self.f)
+		ott = np.dot(o, tt)
+		f = np.dot(ott, self.f)
 		f = f / np.linalg.norm(f)
 		self.f = f.T

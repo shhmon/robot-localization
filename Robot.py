@@ -1,6 +1,7 @@
 import numpy as np
 import pygame
 from Dir import Dir
+from Utils import forward
 
 class RobotSim:
 
@@ -10,36 +11,47 @@ class RobotSim:
 		self.pos = start
 		self.head = head
 	
-	def move(self):
-		pass
-		#probs = self.tm.getT()[self.state]
-		#choices = range(len(probs))
-		#self.state = np.random.choice(choices, p=probs)
-		#return self.state
-	
 	def sense(self, maze):
-		if self.head in maze.shape[self.pos[1]][self.pos[0]]:
+		dirs = maze.shape[self.pos[1]][self.pos[0]]
+
+		# Wall sensor
+		if self.head in dirs:
 			return 1
 		else:
 			return 0
+
+		# Line sensors
+		# fPath = self.head in dirs
+		# lPath = Dir.Left(self.head) in dirs
+		# rPath = Dir.Right(self.head) in dirs
+
+		# if fPath and lPath and rPath:
+		# 	return 0
+		# elif fPath and lPath:
+		# 	return 1
+		# elif fPath and rPath:
+		# 	return 2
+		# elif lPath and rPath:
+		# 	return 3
+		# elif rPath:
+		# 	return 4
+		# elif fPath:
+		# 	return 5
+		# elif lPath:
+		# 	return 6
+		# else:
+		# 	return 7
 	
 	def step(self):
-		if self.head == Dir.N:
-			self.pos = self.pos[0], self.pos[1] - 1
-		elif self.head == Dir.E:
-			self.pos = self.pos[0] + 1, self.pos[1]
-		elif self.head == Dir.S:
-			self.pos = self.pos[0], self.pos[1] + 1
-		elif self.head == Dir.W:
-			self.pos = self.pos[0] - 1, self.pos[1]
+		self.pos = forward(self.pos[0], self.pos[1], self.head.value)
 	
 	def update(self, maze):
 		dirs = maze.shape[self.pos[1]][self.pos[0]]
 
-		if (self.pos[0] == 3 and self.pos[1] == 3):
+		if (self.pos[0] == 2 and self.pos[1] == 3):
 			dirs = [*dirs, Dir.S]
-		elif (self.pos[0] == 3 and self.pos[1] == 4):
-			dirs = [Dir.W, Dir.S, Dir.N]
+		elif (self.pos[0] == 2 and self.pos[1] == 4):
+			dirs = [*dirs, Dir.N]
 
 		if self.head in dirs:
 			self.step()

@@ -77,7 +77,6 @@ class Localizer:
         self.__updateCount = 0
 
     def update(self, trueState, sense):
-        print('prev:', self.stateModel.robotStateToXYH(self.trueState))
         self.sense = sense
         self.trueState = trueState
 

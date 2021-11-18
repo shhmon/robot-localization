@@ -25,7 +25,7 @@ class Maze:
 
 		for y, row in enumerate(self.shape):
 			for x, col in enumerate(row):
-				walls = [dir for dir in list(Dir) if dir not in col]
+				walls = [dir for dir in Dir.Values() if dir not in col]
 
 				#textsurface = myfont.render(f'x:{x} y:{y}', False, (0, 0, 0))
 				#surface.blit(textsurface, (x * self.wallLength + self.wallLength / 4, y * self.wallLength + self.wallLength / 4))

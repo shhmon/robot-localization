@@ -10,6 +10,28 @@ class Dir(Enum):
 	@staticmethod
 	def Values():
 		return [Dir.N, Dir.W, Dir.S, Dir.E]
+	
+	@staticmethod
+	def Left(head):
+		if head == Dir.N:
+			return Dir.W
+		elif head == Dir.W:
+			return Dir.S
+		elif head == Dir.S:
+			return Dir.E
+		elif head == Dir.E:
+			return Dir.N
+	
+	@staticmethod
+	def Right(head):
+		if head == Dir.N:
+			return Dir.E
+		elif head == Dir.E:
+			return Dir.S
+		elif head == Dir.S:
+			return Dir.W
+		elif head == Dir.W:
+			return Dir.N
 
 	@staticmethod
 	def Next(head, alts):

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Maze import Maze
 from Dir import Dir
+from Utils import forward, inside
 
 # The transition model contains the transition matrix and some methods for convenience, 
 # including transposition
@@ -18,37 +19,57 @@ class TransitionModel:
         # Transition matrix (entry ij = probability of going from state i to j)
         self.matrix = np.zeros(shape=(self.dim, self.dim), dtype=float)
 
-        vis = np.empty(shape=(self.dim, self.dim), dtype=object)
-        np.set_printoptions(threshold=np.inf)
-
         for i in range(self.dim):
             x, y, h = self.stateModel.robotStateToXYH(i)
 
-            dirs = list(map(lambda d: d.value, Maze.shape[y][x]))
-            next = Dir.Next(Dir(h), Maze.shape[y][x]).value
+            # More relaxed transitions
+            # for j in range(self.dim):
+            #     nx, ny, nh = self.stateModel.robotStateToXYH(j)
 
-            # nx, ny, nh = step forward
-            if h == Dir.N.value:
-                nx, ny, nh = x, y-1, h
-            elif h == Dir.W.value:
-                nx, ny, nh = x-1, y, h
-            elif h == Dir.S.value:
-                nx, ny, nh = x, y+1, h
-            elif h == Dir.E.value:
-                nx, ny, nh = x+1, y, h
+            #     if (nx, ny) == (x, y) and nh != h:
+            #         if nh == Dir.Left(Dir(h)).value:
+            #             self.matrix[i, j] = 2
+            #         else:
+            #             self.matrix[i, j] = 1
+            #     elif abs(x-nx) + abs(y-ny) == 1:
+            #         if (nx, ny) == forward(x, y, h):
+            #             self.matrix[i, j] = 2
+            #         else:
+            #             self.matrix[i, j] = 0.5
+            
+            # if sum(self.matrix[i]) > 0:
+            #     self.matrix[i] /= sum(self.matrix[i])
+            
+
+            dirs = list(map(lambda d: d.value, Maze.shape[y][x]))
+            next = Dir.Next(Dir(h), Maze.shape[y][x])
+
+            nx, ny = forward(x, y, h)
+            j = self.stateModel.xyhToRobotState(nx, ny, h)
 
             # Current heading available
             if h in dirs:
-                j = self.stateModel.xyhToRobotState(nx, ny, nh)
                 self.matrix[i, j] = 1
             # Wall in front
             else:
-                j = self.stateModel.xyhToRobotState(x, y, next)
-                self.matrix[i, j] = 0.95
-
-                if nx > 0 and nx < self.cols and ny > 0 and ny < self.rows:
-                    j = self.stateModel.xyhToRobotState(nx, ny, nh)
+                if inside(nx, ny, self.rows, self.cols):
                     self.matrix[i, j] = 0.05
+
+                cur = Dir.Next(Dir(h), Dir.Values())
+                cnt = 0
+
+                while cur != next:
+                    j = self.stateModel.xyhToRobotState(x, y, cur.value)
+                    fx, fy = forward(x, y, cur.value)
+
+                    if inside(fx, fy, self.rows, self.cols):
+                        self.matrix[i, j] = 0.2 - cnt*0.1
+                        cnt += 1
+
+                    cur = Dir.Left(cur)
+                
+                j = self.stateModel.xyhToRobotState(x, y, next.value)
+                self.matrix[i, j] = 1 - cnt*0.2 - (cnt-1)*0.1 - 0.05
                 
                 
     # retrieve the number of states represented in the matrix                        

@@ -8,39 +8,62 @@ from Dir import Dir
 # The last of these vectors contains the probabilities for the sensor to produce nothing
 
 class ObservationModel:
-    def __init__(self, stateModel) :
+    def __init__(self, stateModel):
         self.stateModel = stateModel
         self.rows, self.cols, self.head = stateModel.getDimensions()
 
         self.dim = self.rows * self.cols * self.head
-        # Wall, noWall, nothing
+
+        # Three light sensors, Left Front Right
+        # 0 = LLL, 1 = LLN, 2 = NLL, 2 = LNL
+        # 4 = NNL, 5 = NLN, 6 = LNN, 7 = NNN
+        #self.numOfReadings = 2**3
+
         self.numOfReadings = 2
 
         self.vectors = np.zeros(shape=(self.numOfReadings, self.dim))
+
+        # Wall sensor
+        for rs in range(self.dim):
+            x, y, h = self.stateModel.robotStateToXYH(rs)
+            dirs = list(map(lambda d: d.value, Maze.shape[y][x]))
+
+            if h not in dirs:
+                self.vectors[0, rs] = 1
+            else:
+                self.vectors[1, rs] = 1
+
+        # Line sensors
+        # for rs in range(self.dim):
+        #     x, y, h = self.stateModel.robotStateToXYH(rs)
+
+        #     dirs = Maze.shape[y][x]
+        #     head = Dir(h)
+            
+        #     fPath = head in dirs
+        #     lPath = Dir.Left(head) in dirs
+        #     rPath = Dir.Right(head) in dirs
+
+        #     if fPath and lPath and rPath:
+        #         self.vectors[0, rs] = 1
+        #     elif fPath and lPath:
+        #         self.vectors[1, rs] = 1
+        #     elif fPath and rPath:
+        #         self.vectors[2, rs] = 1
+        #     elif lPath and rPath:
+        #         self.vectors[3, rs] = 1
+        #     elif rPath:
+        #         self.vectors[4, rs] = 1
+        #     elif fPath:
+        #         self.vectors[5, rs] = 1
+        #     elif lPath:
+        #         self.vectors[6, rs] = 1
+        #     else:
+        #         self.vectors[7, rs] = 1
+                
         
         for o in range(self.numOfReadings):
-
-            for rs in range(self.dim):
-                x, y, h = self.stateModel.robotStateToXYH(rs)
-                dirs = list(map(lambda d: d.value, Maze.shape[y][x]))
-
-                if o == 0 and h not in dirs:
-                    self.vectors[o, rs] = 1
-                elif o == 1 and h in dirs:
-                    self.vectors[o, rs] = 1
-
             self.vectors[o] /= sum(self.vectors[o])
-                
-            print(sum(self.vectors[o]))
-
-                # If current heading blocked by wall
-                # if o == 0 and h not in dirs:
-                #     self.vectors[o, rs] = 0.8
-                # if o == 1 and h in dirs:
-                #     self.vectors[o, rs] = 0.2
-
-                # Add nothing
-                # self.vectors[self.numOfReadings-1, rs] = 0.1
 
     # get the number of possible sensor readings
     def getNrOfReadings( self) :
