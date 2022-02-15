@@ -79,6 +79,7 @@ while True:
     print(f'update: localizer pos {px, py}')
 
     screen.fill(white)
+    localizer.hmm.draw(screen, stateModel, sense, wallLength)
 
     rect = pygame.Rect(px * wallLength, py * wallLength, wallLength, wallLength)
     pygame.draw.rect(screen, (200,200,255), rect)
